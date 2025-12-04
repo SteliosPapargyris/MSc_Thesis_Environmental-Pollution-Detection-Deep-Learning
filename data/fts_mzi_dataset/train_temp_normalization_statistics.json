@@ -1,0 +1,31 @@
+{
+  "overall_statistics": {
+    "mean": [
+      24.95
+    ],
+    "std": [
+      2.9011491975882016
+    ],
+    "feature_names": [
+      "train_Temperature"
+    ],
+    "target_class": 4,
+    "excluded_chip": 5
+  },
+  "per_chip_statistics": [
+    {
+      "chip": 1,
+      "features": {
+        "train_Temperature": 24.95
+      },
+      "std_values": {
+        "train_Temperature": 2.9011491975882016
+      }
+    }
+  ],
+  "metadata": {
+    "creation_date": "2025-09-17T13:34:27.801151",
+    "total_chips_processed": 1,
+    "feature_count": 1
+  }
+}

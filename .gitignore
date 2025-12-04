@@ -1,7 +1,115 @@
-.history/
-data/**
-generate_interferogram.py
-create_csv_dataset.py
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+
+# Virtual Environments
+venv/
+env/
+ENV/
+.venv
+
+# IDE
 .idea/
 .vscode/
-pths/**
+.DS_Store
+*.swp
+*.swo
+*~
+
+# History files (VSCode local history)
+.history/
+
+# Poetry
+poetry.lock
+
+# Data files
+# data/
+*.csv
+*.pkl
+*.pickle
+# pths/
+# out/
+
+# Model checkpoints and results
+# pths/
+*.pth
+*.pt
+*.ckpt
+
+# Training outputs and results
+hyperparameter_search_results/
+baseline_results_multiple_seeds/
+series_training/
+parallel_training/
+# out/
+*.log
+*.txt
+unfrozen_training_log.txt
+
+# Experiment directories (old experiments)
+1stAutoencoder_toBaselineChipT25_29_SecondAutoencoder_toBaselineChipT27/
+1stAutoencoderTemp27of_the_same_chip_2ndAutoencoderChainTargetBaselineChip400rowsInTemp27/
+classification_with_only_robust_scaling_not_standard_scaler/
+normalization_and_per_chip_classification/
+one_external_classifier_for_all_chips/
+one_external_classifier_for_all_chips_with_frozen_autoencoder/
+only_normalization_and_classifier/
+individuals_autoencoders_with_unfrozen_layers/
+COMPLETED/
+README/
+# utils/activations.py
+# utils/activations2.py
+
+# Unused scripts and utilities (excluded from main project)
+hyperparameter_search.py
+create_averaged_plots_from_json.py
+# apply_standard_scaler_global.py
+bibliography.bib
+check_training_progress.sh
+create_csv_dataset.py
+data_preparation.py
+debug_gradient_isolation.py
+generate_interferogram_ideal.py
+generate_interferogram.py
+inference_with_training_reverse_order.py
+inference.py
+journal_paper.tex
+msc_thesis.tex
+normalize_chips.py
+OPTIMIZED_GRID_SUMMARY.md
+PARALLEL_TRAINING_GUIDE.md
+run_full_pipeline.py
+run_parallel_standard_scaler.py
+run_reverse_order_all_seeds.sh
+run_unfrozen_training_multiple_seeds.py
+train_baseline_autoencoder.py
+train_autoencoder.py
+train_classifier.py
+normalize_chips.py
+corrected_experimental_evaluation.tex
+
+# Plots and visualizations
+*.png
+*.jpg
+*.jpeg
+*.pdf
+
+# Documentation (keep source, ignore compiled)
+*.aux
+*.bbl
+*.blg
+*.log
+*.out
+*.toc
+*.synctex.gz
+
+# JSON results (optional - uncomment if you want to exclude these)
+# *.json
+
+# Temporary files
+*.tmp
+*.temp
+.claude/

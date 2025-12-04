@@ -32,7 +32,8 @@ def normalize_all_chips():
     method_mapping = {
         'class_based_mean_std': 'mean_std',
         'class_based_minmax': 'minmax',
-        'class_based_robust': 'robust'
+        'class_based_robust': 'robust',
+        'class_based_mean_std_then_scaler': 'mean_std_scaler'
     }
 
     method_suffix = method_mapping.get(CURRENT_NORMALIZATION, 'unknown')
@@ -43,6 +44,21 @@ def normalize_all_chips():
         output_file = output_dir / f"chip_{i}_{method_suffix}.csv"
         normalized_df.to_csv(output_file, index=False)
         print(f"Saved: {output_file}")
+
+    # # Normalize baseline_chip.csv
+    # baseline_file = Path("data/out/baseline_chip_extended.csv")
+    # if baseline_file.exists():
+    #     print("Normalizing baseline_chip.csv...")
+    #     baseline_df = pd.read_csv(baseline_file)
+    #     normalized_baseline = apply_normalization([baseline_df], CURRENT_NORMALIZATION)[0]
+
+    #     baseline_output_dir = Path(f"data/out/{method_suffix}/baseline")
+    #     baseline_output_dir.mkdir(parents=True, exist_ok=True)
+    #     baseline_output_file = baseline_output_dir / f"baseline_chip_extended_{method_suffix}.csv"
+    #     normalized_baseline.to_csv(baseline_output_file, index=False)
+    #     print(f"Saved: {baseline_output_file}")
+    # else:
+    #     print("baseline_chip.csv not found, skipping...")
 
 if __name__ == "__main__":
     normalize_all_chips()

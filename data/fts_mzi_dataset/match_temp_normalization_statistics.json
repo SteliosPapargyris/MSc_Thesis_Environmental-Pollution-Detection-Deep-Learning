@@ -1,0 +1,31 @@
+{
+  "overall_statistics": {
+    "mean": [
+      25.0
+    ],
+    "std": [
+      1.0
+    ],
+    "feature_names": [
+      "match_Temperature"
+    ],
+    "target_class": 4,
+    "excluded_chip": 5
+  },
+  "per_chip_statistics": [
+    {
+      "chip": 1,
+      "features": {
+        "match_Temperature": 25.0
+      },
+      "std_values": {
+        "match_Temperature": 1.0
+      }
+    }
+  ],
+  "metadata": {
+    "creation_date": "2025-09-17T13:34:32.565848",
+    "total_chips_processed": 1,
+    "feature_count": 1
+  }
+}

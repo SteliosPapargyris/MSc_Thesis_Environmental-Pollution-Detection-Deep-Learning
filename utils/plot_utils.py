@@ -3,12 +3,34 @@ import seaborn as sns
 import os
 import numpy as np
 import torch
+import time
 from utils.config import *
 
 def get_plot_save_path(filename):
     """Get the appropriate save path for plots based on current configuration"""
     os.makedirs(output_base_dir, exist_ok=True)
     return f'{output_base_dir}/{filename}'
+
+def robust_savefig(filepath, max_retries=3, **kwargs):
+    """
+    Robust save function for matplotlib figures with retry logic for macOS file system issues.
+
+    Args:
+        filepath: Path to save the figure
+        max_retries: Number of retry attempts (default: 3)
+        **kwargs: Additional arguments to pass to plt.savefig (e.g., dpi, bbox_inches)
+    """
+    for attempt in range(max_retries):
+        try:
+            plt.savefig(filepath, **kwargs)
+            return  # Success
+        except (OSError, TimeoutError) as e:
+            if attempt < max_retries - 1:
+                print(f"Warning: Failed to save plot (attempt {attempt + 1}/{max_retries}): {e}")
+                time.sleep(0.5)  # Brief delay before retry
+            else:
+                print(f"Error: Could not save plot after {max_retries} attempts: {e}")
+                raise
 
 def plot_raw_mean_feature_per_class(df, class_column='Class', save_path='raw_mean_feature_per_class.png', title='Raw Mean Feature per Class', log_y=False):
     """
@@ -38,8 +60,8 @@ def plot_raw_mean_feature_per_class(df, class_column='Class', save_path='raw_mea
     plt.legend()
     plt.grid(True)
     plt.tight_layout()
-    plt.savefig(save_path)
-    plt.show()
+    robust_savefig(save_path)
+    plt.close()
 
 
 def plot_minmax_normalized_mean_feature_per_class(df, class_column='Class', save_path='minmax_normalized_mean_feature_per_class.png', title='Min-Max Normalized Mean Feature per Class'):
@@ -68,8 +90,8 @@ def plot_minmax_normalized_mean_feature_per_class(df, class_column='Class', save
     plt.legend()
     plt.grid(True, alpha=0.7)
     plt.tight_layout()
-    plt.savefig(save_path, dpi=300, bbox_inches='tight')
-    plt.show()
+    robust_savefig(save_path, dpi=300, bbox_inches='tight')
+    plt.close()
     print(f"Min-max normalized plot saved to: {save_path}")
 
 
@@ -98,12 +120,52 @@ def plot_robust_normalized_mean_feature_per_class(df, class_column='Class', save
     plt.legend()
     plt.grid(True, alpha=0.7)
     plt.tight_layout()
-    plt.savefig(save_path, dpi=300, bbox_inches='tight')
-    plt.show()
+    robust_savefig(save_path, dpi=300, bbox_inches='tight')
+    plt.close()
     print(f"Robust scaled plot saved to: {save_path}")
 
 
-def plot_conf_matrix(conf_matrix, label_encoder, model_name, output_dir=None):
+def plot_temperature_autoencoder_output(df, class_column='Class', save_path='mean_peaks_per_class_after_temperature_autoencoder.png', title='Mean Across All Chips - After Temperature Autoencoder'):
+    """
+    Plots the mean features per class after temperature autoencoder processing.
+    Uses numeric column names (0-31) instead of Peak column names.
+
+    Args:
+        df (pd.DataFrame): Input dataframe containing autoencoder output features (columns 0-31) and a class column.
+        class_column (str): Name of the column containing class labels.
+        save_path (str): Path to save the plot.
+        title (str): Plot title.
+    """
+    # Get numeric peak columns (0-31)
+    peak_cols = [str(i) for i in range(32)]
+
+    # Calculate mean per class
+    mean_per_class = df.groupby(class_column)[peak_cols].mean()
+
+    # Create x-axis values (1-32 for peak indices)
+    x = np.arange(1, len(peak_cols) + 1)
+
+    # Create the plot with matching colors
+    plt.figure(figsize=(12, 6))
+    colors = ['#1f77b4', '#ff7f0e', '#2ca02c', '#d62728']  # Blue, Orange, Green, Red (matching Class 1-4)
+
+    for idx, (class_label, row) in enumerate(mean_per_class.iterrows()):
+        color_idx = int(class_label) - 1 if int(class_label) <= 4 else idx
+        plt.plot(x, row.values, label=f'Class {int(class_label)}',
+                marker='o', markersize=3, color=colors[color_idx], linewidth=1.5)
+
+    plt.title(title, fontsize=14)
+    plt.xlabel('Peak Index (1-32) - Train Peaks', fontsize=12)
+    plt.ylabel('Normalized Value (Mean Across All Chips)', fontsize=12)
+    plt.legend()
+    plt.grid(True, alpha=0.7)
+    plt.tight_layout()
+    robust_savefig(save_path, dpi=300, bbox_inches='tight')
+    plt.close()
+    print(f"Temperature autoencoder output plot saved to: {save_path}")
+
+
+def plot_conf_matrix(conf_matrix, label_encoder, model_name, output_dir):
     plt.figure()
     ax = sns.heatmap(
         conf_matrix,
@@ -118,16 +180,12 @@ def plot_conf_matrix(conf_matrix, label_encoder, model_name, output_dir=None):
     plt.title(f'Confusion Matrix_{model_name}')
     plt.tight_layout()
 
-    # Use provided output directory or default to current normalization configuration
-    if output_dir is None:
-        output_dir = output_base_dir
     os.makedirs(output_dir, exist_ok=True)
-    plt.savefig(f"{output_dir}/confusion_matrix_{model_name}.jpg")
-    plt.show()
+    robust_savefig(f"{output_dir}/confusion_matrix_{model_name}.png", dpi=100, bbox_inches='tight')
+    plt.close()
 
 
-def plot_train_and_val_losses(training_losses, validation_losses, model_name):
-    # Plotting
+def plot_train_and_val_losses(training_losses, validation_losses, model_name, output_dir):
     plt.figure(figsize=(10, 5))
     plt.plot(training_losses, label='Training Loss')
     plt.plot(validation_losses, label='Validation Loss')
@@ -137,11 +195,9 @@ def plot_train_and_val_losses(training_losses, validation_losses, model_name):
     plt.legend()
     plt.grid(True)
 
-    # Use current normalization configuration for output directory
-    output_dir = output_base_dir
     os.makedirs(output_dir, exist_ok=True)
-    plt.savefig(f'{output_dir}/train_and_val_loss_{model_name}.png')
-    plt.show()
+    robust_savefig(f'{output_dir}/train_and_val_loss_{model_name}.png', dpi=100, bbox_inches='tight')
+    plt.close()
 
 def plot_normalized_train_mean_feature_per_class(df, class_column='train_Class', save_path=None, title='Normalized Train Mean Feature per Class'):
     """
@@ -179,8 +235,8 @@ def plot_normalized_train_mean_feature_per_class(df, class_column='train_Class',
     plt.legend()
     plt.grid(True)
     plt.tight_layout()
-    plt.savefig(save_path)
-    plt.show()
+    robust_savefig(save_path)
+    plt.close()
 
 def plot_raw_test_mean_feature_per_class(df, class_column='Class', save_path='out/raw/raw_test_mean_feature_per_class.png', title='Raw Test Mean Feature per Class'):
     """
@@ -211,10 +267,10 @@ def plot_raw_test_mean_feature_per_class(df, class_column='Class', save_path='ou
     plt.legend()
     plt.grid(True)
     plt.tight_layout()
-    plt.savefig(save_path)
-    plt.show()
+    robust_savefig(save_path)
+    plt.close()
 
-def plot_transferred_data_combined(all_transferred_data, all_class_labels, data_type):
+def plot_transferred_data_combined(all_transferred_data, all_class_labels, data_type, output_dir):
     """
     Plot combined transferred data across all chips - shows mean per class
 
@@ -249,9 +305,9 @@ def plot_transferred_data_combined(all_transferred_data, all_class_labels, data_
         class_data = data_np[class_mask]
         mean_data = np.mean(class_data, axis=0)
 
-        plt.plot(mean_data, label=f'Class {int(class_label)}', linewidth=1.5, marker='o', markersize=2)
+        plt.plot(mean_data, label=f'Class {int(class_label) + 1}', linewidth=1.5, marker='o', markersize=2)
 
-    plt.title(f'Transferred {data_type.title()} Data - Mean Across All Chips')
+    plt.title(f'Chip-to-Baseline {data_type.title()} Data - Mean Across All Chips')
     plt.xlabel('Feature Index')
     plt.ylabel('Transferred Value')
     plt.legend()
@@ -259,8 +315,10 @@ def plot_transferred_data_combined(all_transferred_data, all_class_labels, data_
     plt.tight_layout()
 
     # Save plot
-    save_path = get_plot_save_path(f'transferred_{data_type}_all_chips_combined.png')
-    plt.savefig(save_path)
+    filename = f'chip_to_baseline_{data_type}_mean_all_chips.png'
+    os.makedirs(output_dir, exist_ok=True)
+    save_path = os.path.join(output_dir, filename)
+    robust_savefig(save_path)
     plt.close()
     print(f"Saved combined plot: {save_path}")
 
@@ -272,9 +330,9 @@ def plot_transferred_data_combined(all_transferred_data, all_class_labels, data_
         class_data = data_np[class_mask]
         mean_data = np.mean(class_data, axis=0)
 
-        plt.plot(mean_data, label=f'Class {int(class_label)}', linewidth=1.5, marker='o', markersize=2)
+        plt.plot(mean_data, label=f'Class {int(class_label) + 1}', linewidth=1.5, marker='o', markersize=2)
 
-    plt.title(f'Transferred {data_type.title()} Data - Mean Across All Chips (Zoomed)')
+    plt.title(f'Chip-to-Baseline {data_type.title()} Data - Mean Across All Chips (Zoomed)')
     plt.xlabel('Feature Index')
     plt.ylabel('Transferred Value')
     plt.ylim(-0.3, 0.6)  # Focus on lower range to see classes 1-3 better
@@ -283,12 +341,13 @@ def plot_transferred_data_combined(all_transferred_data, all_class_labels, data_
     plt.tight_layout()
 
     # Save zoomed plot
-    save_path_zoomed = get_plot_save_path(f'transferred_{data_type}_all_chips_combined_zoomed.png')
-    plt.savefig(save_path_zoomed)
+    filename_zoomed = f'chip_to_baseline_{data_type}_mean_all_chips_zoomed.png'
+    save_path_zoomed = os.path.join(output_dir, filename_zoomed)
+    robust_savefig(save_path_zoomed)
     plt.close()
     print(f"Saved zoomed plot: {save_path_zoomed}")
 
-def plot_denoised_data_combined(all_denoised_data, all_class_labels, data_type):
+def plot_denoised_data_combined(all_denoised_data, all_class_labels, data_type, output_dir):
     """
     Plot combined denoised data from first autoencoder across all chips - shows mean per class
 
@@ -323,9 +382,9 @@ def plot_denoised_data_combined(all_denoised_data, all_class_labels, data_type):
         class_data = data_np[class_mask]
         mean_data = np.mean(class_data, axis=0)
 
-        plt.plot(mean_data, label=f'Class {int(class_label)}', linewidth=1.5, marker='o', markersize=2)
+        plt.plot(mean_data, label=f'Class {int(class_label) + 1}', linewidth=1.5, marker='o', markersize=2)
 
-    plt.title(f'Denoised {data_type.title()} Data - Mean Across All Chips (First Autoencoder)')
+    plt.title(f'Chip-to-Temperature {data_type.title()} Data - Mean Across All Chips (First Autoencoder)')
     plt.xlabel('Feature Index')
     plt.ylabel('Denoised Value')
     plt.legend()
@@ -333,8 +392,10 @@ def plot_denoised_data_combined(all_denoised_data, all_class_labels, data_type):
     plt.tight_layout()
 
     # Save plot
-    save_path = get_plot_save_path(f'denoised_{data_type}_all_chips_combined.png')
-    plt.savefig(save_path)
+    filename = f'chip_to_temperature_{data_type}_mean_all_chips.png'
+    os.makedirs(output_dir, exist_ok=True)
+    save_path = os.path.join(output_dir, filename)
+    robust_savefig(save_path)
     plt.close()
     print(f"Saved denoised combined plot: {save_path}")
 
@@ -346,9 +407,9 @@ def plot_denoised_data_combined(all_denoised_data, all_class_labels, data_type):
         class_data = data_np[class_mask]
         mean_data = np.mean(class_data, axis=0)
 
-        plt.plot(mean_data, label=f'Class {int(class_label)}', linewidth=1.5, marker='o', markersize=2)
+        plt.plot(mean_data, label=f'Class {int(class_label) + 1}', linewidth=1.5, marker='o', markersize=2)
 
-    plt.title(f'Denoised {data_type.title()} Data - Mean Across All Chips (Zoomed)')
+    plt.title(f'Chip-to-Temperature {data_type.title()} Data - Mean Across All Chips (Zoomed)')
     plt.xlabel('Feature Index')
     plt.ylabel('Denoised Value')
     plt.ylim(-0.2, 0.4)  # Adjust range based on typical denoised values
@@ -357,8 +418,9 @@ def plot_denoised_data_combined(all_denoised_data, all_class_labels, data_type):
     plt.tight_layout()
 
     # Save zoomed plot
-    save_path_zoomed = get_plot_save_path(f'denoised_{data_type}_all_chips_combined_zoomed.png')
-    plt.savefig(save_path_zoomed)
+    filename_zoomed = f'chip_to_temperature_{data_type}_mean_all_chips_zoomed.png'
+    save_path_zoomed = os.path.join(output_dir, filename_zoomed)
+    robust_savefig(save_path_zoomed)
     plt.close()
     print(f"Saved denoised zoomed plot: {save_path_zoomed}")
 
@@ -456,8 +518,8 @@ def plot_normalized_data_distribution(normalized_datasets, chip_ids, norm_method
 
     # Save plot
     save_path = get_plot_save_path(f'normalized_data_distribution_{norm_method}.png')
-    plt.savefig(save_path, dpi=300, bbox_inches='tight')
-    plt.show()
+    robust_savefig(save_path, dpi=300, bbox_inches='tight')
+    plt.close()
     print(f"Saved normalized data distribution plot: {save_path}")
 
 def plot_raw_data_distribution(raw_datasets, chip_ids, output_dir="out/raw"):
@@ -540,6 +602,6 @@ def plot_raw_data_distribution(raw_datasets, chip_ids, output_dir="out/raw"):
 
     # Save plot
     save_path = f"{output_dir}/raw_data_distribution_{len(chip_ids)}chips.png"
-    plt.savefig(save_path, dpi=300, bbox_inches='tight')
-    plt.show()
+    robust_savefig(save_path, dpi=300, bbox_inches='tight')
+    plt.close()
     print(f"Saved raw data distribution plot: {save_path}")
