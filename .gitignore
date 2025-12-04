@@ -35,7 +35,7 @@ poetry.lock
 
 # Model checkpoints and results
 # pths/
-*.pth
+# *.pth
 *.pt
 *.ckpt
 
