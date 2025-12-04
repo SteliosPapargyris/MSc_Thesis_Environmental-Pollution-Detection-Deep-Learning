@@ -1,0 +1,10 @@
+{
+  "seed": 42,
+  "autoencoder_patience": 10,
+  "autoencoder_early_stopping": 30,
+  "classifier_patience": 5,
+  "classifier_early_stopping": 15,
+  "batch_size": 256,
+  "start_time": "2025-10-21T19:13:22.510652",
+  "end_time": "2025-10-21T21:36:12.514965"
+}

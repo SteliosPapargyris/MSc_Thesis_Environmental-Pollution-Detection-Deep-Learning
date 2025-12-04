@@ -1,0 +1,45 @@
+{
+  "temperature_autoencoder_classifier": {
+    "train_accuracy": {
+      "mean": 90.98942857142858,
+      "std": 0.09790290900599634
+    },
+    "val_accuracy": {
+      "mean": 89.10194902548726,
+      "std": 0.08562515109816038
+    },
+    "test_accuracy": {
+      "mean": 89.23523523523525,
+      "std": 0.16330127969060196
+    }
+  },
+  "baseline_autoencoder_classifier": {
+    "train_accuracy": {
+      "mean": 86.56642857142856,
+      "std": 0.36392587269433274
+    },
+    "val_accuracy": {
+      "mean": 85.15142428785607,
+      "std": 0.3530995462198137
+    },
+    "test_accuracy": {
+      "mean": 85.006006006006,
+      "std": 0.5654052055028941
+    }
+  },
+  "global_classifier": {
+    "train_accuracy": {
+      "mean": 87.50685714285714,
+      "std": 0.42609752644297005
+    },
+    "val_accuracy": {
+      "mean": 86.8055,
+      "std": 0.4168584891782814
+    },
+    "test_accuracy": {
+      "mean": 86.825,
+      "std": 0.4943177115985233
+    }
+  },
+  "num_seeds": 10
+}

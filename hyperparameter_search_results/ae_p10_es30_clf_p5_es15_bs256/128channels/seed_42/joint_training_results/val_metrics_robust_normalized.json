@@ -1,0 +1,62 @@
+{
+    "dataset": "val",
+    "accuracy": 0.895625,
+    "macro_precision": 0.8949357170062986,
+    "macro_recall": 0.895625,
+    "macro_f1": 0.8950833133085562,
+    "weighted_precision": 0.8949357170062987,
+    "weighted_recall": 0.895625,
+    "weighted_f1": 0.8950833133085562,
+    "per_class_metrics": {
+        "class_0": {
+            "precision": 0.8979796964519047,
+            "recall": 0.8934,
+            "f1_score": 0.8956839941851722,
+            "support": 10000
+        },
+        "class_1": {
+            "precision": 0.8054803083975828,
+            "recall": 0.7731,
+            "f1_score": 0.7889580569445862,
+            "support": 10000
+        },
+        "class_2": {
+            "precision": 0.8780837636259323,
+            "recall": 0.9183,
+            "f1_score": 0.897741714732623,
+            "support": 10000
+        },
+        "class_3": {
+            "precision": 0.9981990995497749,
+            "recall": 0.9977,
+            "f1_score": 0.997949487371843,
+            "support": 10000
+        }
+    },
+    "confusion_matrix": [
+        [
+            8934,
+            1050,
+            5,
+            11
+        ],
+        [
+            1008,
+            7731,
+            1257,
+            4
+        ],
+        [
+            1,
+            813,
+            9183,
+            3
+        ],
+        [
+            6,
+            4,
+            13,
+            9977
+        ]
+    ]
+}

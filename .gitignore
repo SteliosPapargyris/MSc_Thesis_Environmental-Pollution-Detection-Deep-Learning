@@ -40,7 +40,7 @@ poetry.lock
 *.ckpt
 
 # Training outputs and results
-hyperparameter_search_results/
+hyperparameter_search_results/old
 baseline_results_multiple_seeds/
 series_training/
 parallel_training/
