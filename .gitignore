@@ -26,7 +26,7 @@ ENV/
 poetry.lock
 
 # Data files
-data/
+# data/
 *.csv
 *.pkl
 *.pickle
