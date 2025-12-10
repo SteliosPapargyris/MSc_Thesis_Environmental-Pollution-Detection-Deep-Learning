@@ -26,11 +26,11 @@ ENV/
 poetry.lock
 
 # Data files
-# data/
+data/
 *.csv
 *.pkl
 *.pickle
-# pths/
+pths/
 # out/
 
 # Model checkpoints and results
@@ -65,12 +65,10 @@ README/
 
 # Unused scripts and utilities (excluded from main project)
 hyperparameter_search.py
-create_averaged_plots_from_json.py
 # apply_standard_scaler_global.py
 bibliography.bib
 check_training_progress.sh
 create_csv_dataset.py
-data_preparation.py
 debug_gradient_isolation.py
 generate_interferogram_ideal.py
 generate_interferogram.py
